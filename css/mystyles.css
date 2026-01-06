@@ -1,0 +1,52 @@
+:root {
+    --bs-primary: #145c4c;
+}
+
+.text-primary {
+    color: var(--bs-primary) !important;
+}
+
+.bg-primary {
+    background-color: var(--bs-primary) !important;
+}
+
+.med-font {
+    font-size: medium;
+}
+
+.scratch-bg-color {
+    background-color: azure;
+}
+
+.font-choice {
+    color: slategrey;
+    font-family: sans-serif;
+}
+
+.link-options {
+    color: dodgerblue;
+}
+
+.link-options:hover {
+    color: blue;
+}
+
+.link-options:visited {
+    color: crimson;
+}
+
+.elegant {
+    font-style: italic;
+    color: plum;
+}
+
+.powerful {
+    font-style: oblique;
+    font-weight: bolder;
+    color: red;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+#viz1765406174060 {
+    max-width: 1000px;
+}

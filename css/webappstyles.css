@@ -1,0 +1,53 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: #f4f4f4;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+}
+
+.exercise-list {
+    margin-top: 20px;
+}
+
+.exercise {
+    background: white;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+button {
+    padding: 6px 12px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+}
+
+.add-section {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+#historyTable td,
+#historyTable th {
+    padding: 6px;
+    border-bottom: 1px solid #ccc;
+}
+
+.dark-mode {
+    background: #222;
+    color: white;
+}
