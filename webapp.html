@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ultimate Fitness Repetition Tracker</title>
+  <link rel="stylesheet" href="css/webappstyles.css">
+
+</head>
+<body>
+  <div class="container">
+    <h1>Ultimate Fitness Repetition Tracker</h1>
+
+    <!-- Add Exercise -->
+    <div class="add-section">
+      <input id="exerciseName" type="text" placeholder="New exercise name" />
+      <button onclick="addExercise()">Add Exercise</button>
+    </div>
+
+    <!-- Exercise List -->
+    <div id="exerciseList" class="exercise-list"></div>
+
+    <!-- Daily Summary -->
+    <h2>Daily Summary</h2>
+    <p>Total Reps Today: <span id="totalReps">0</span></p>
+    <p>Exercises Completed: <span id="completedExercises">0</span></p>
+    <p>Best Day: <span id="bestDay">0</span> reps</p>
+
+    <!-- History -->
+    <h2>History (Last 7 Days)</h2>
+    <table id="historyTable"></table>
+
+    <!-- Workout Mode -->
+    <h2>Workout Mode</h2>
+    <button onclick="startWorkoutMode()">Start Workout</button>
+    <p id="workoutDisplay"></p>
+
+    <!-- Timer -->
+    <h2>Timer</h2>
+    <button onclick="startTimer()">Start</button>
+    <button onclick="stopTimer()">Stop</button>
+    <button onclick="resetTimer()">Reset</button>
+    <p id="timerDisplay">0s</p>
+
+    <!-- Chart -->
+    <h2>Progress Chart</h2>
+    <canvas id="progressChart" width="400" height="200"></canvas>
+  </div>
+
+  <script>
+    let exercises = JSON.parse(localStorage.getItem("exercises")) || {};
+    let history = JSON.parse(localStorage.getItem("history")) || {};
+    let dark = false;
+    let timer = null;
+    let time = 0;
+
+    function save() {
+      localStorage.setItem("exercises", JSON.stringify(exercises));
+      localStorage.setItem("history", JSON.stringify(history));
+    }
+
+    function addExercise() {
+      const name = document.getElementById("exerciseName").value.trim();
+      if (!name) return;
+      exercises[name] = 0;
+      save();
+      render();
+      document.getElementById("exerciseName").value = "";
+    }
+
+    function updateExercise(name, amount) {
+      exercises[name] += amount;
+      if (exercises[name] < 0) exercises[name] = 0;
+      save();
+      render();
+    }
+
+    function removeExercise(name) {
+      delete exercises[name];
+      save();
+      render();
+    }
+
+    function render() {
+      const list = document.getElementById("exerciseList");
+      list.innerHTML = "";
+      let total = 0;
+      let completed = 0;
+
+      for (let ex in exercises) {
+        total += exercises[ex];
+        if (exercises[ex] > 0) completed++;
+
+        list.innerHTML += `
+          <div class='exercise'>
+            <strong>${ex}</strong>
+            <div>
+              <button onclick="updateExercise('${ex}', -1)">-</button>
+              <span>${exercises[ex]}</span>
+              <button onclick="updateExercise('${ex}', 1)">+</button>
+              <button onclick="removeExercise('${ex}')">X</button>
+            </div>
+          </div>
+        `;
+      }
+
+      document.getElementById("totalReps").innerText = total;
+      document.getElementById("completedExercises").innerText = completed;
+
+      const best = localStorage.getItem("bestDay") || 0;
+      if (total > best) localStorage.setItem("bestDay", total);
+      document.getElementById("bestDay").innerText = localStorage.getItem("bestDay");
+
+      renderHistory();
+      renderChart();
+    }
+
+    function renderHistory() {
+      const table = document.getElementById("historyTable");
+      const today = new Date().toLocaleDateString();
+      history[today] = Object.values(exercises).reduce((a,b)=>a+b,0);
+      save();
+
+      let rows = "<tr><th>Date</th><th>Total Reps</th></tr>";
+      const last7 = Object.entries(history).slice(-7);
+      last7.forEach(([date, reps]) => {
+        rows += `<tr><td>${date}</td><td>${reps}</td></tr>`;
+      });
+      table.innerHTML = rows;
+    }
+
+    function renderChart() {
+      const canvas = document.getElementById("progressChart");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const last7 = Object.values(history).slice(-7);
+      const max = Math.max(...last7, 1);
+
+      last7.forEach((val, i) => {
+        const barHeight = (val / max) * 180;
+        ctx.fillRect(i * 50 + 20, 200 - barHeight, 30, barHeight);
+      });
+    }
+
+    function startWorkoutMode() {
+      const keys = Object.keys(exercises);
+      if (!keys.length) return;
+      let i = 0;
+      const display = document.getElementById("workoutDisplay");
+
+      function next() {
+        if (i >= keys.length) {
+          display.innerText = "Workout Complete!";
+          return;
+        }
+        display.innerHTML = `${keys[i]} <br><button onclick="next()">Done</button>`;
+        i++;
+      }
+      next();
+    }
+
+    function startTimer() {
+      if (timer) return;
+      timer = setInterval(() => {
+        time++;
+        document.getElementById("timerDisplay").innerText = time + "s";
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timer);
+      timer = null;
+    }
+
+    function resetTimer() {
+      stopTimer();
+      time = 0;
+      document.getElementById("timerDisplay").innerText = "0s";
+    }
+
+    function toggleDarkMode() {
+      dark = !dark;
+      document.body.classList.toggle("dark-mode", dark);
+    }
+
+    render();
+  </script>
+  <a href="index.html">Back to Scratch</a>
+</body>
+</html>
